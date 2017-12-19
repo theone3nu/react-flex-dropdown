@@ -60,7 +60,7 @@ class FlexDropDown extends Component {
   };
 
   keyDownHandler = e => {
-    const { filteredData, selectedValue } = this.state;
+    const { filteredData, selectedValue, showDropdown } = this.state;
     if (filteredData.length === 0) {
       return;
     }
@@ -69,7 +69,7 @@ class FlexDropDown extends Component {
       const selectedItem = filteredData.find(item => item.label.toLowerCase() === selectedValue.toLowerCase());
       if (selectedIndex === -1) {
         return;
-      } else {
+      } else if(showDropdown) {
         this.props.onItemSelect(selectedItem.value);
         this.setState({ showDropdown: false, selectedValue: selectedItem.label });
         return;
@@ -87,6 +87,7 @@ class FlexDropDown extends Component {
         this.setState({ selectedValue: filteredData[selectedIndex].label, selectedItem: filteredData[selectedIndex] });
       }
     } else if (e.keyCode === 38) {
+      e.preventDefault();
       const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedValue.toLowerCase());
       this.setState({ showDropdown: true });
       if (selectedIndex === -1) {
