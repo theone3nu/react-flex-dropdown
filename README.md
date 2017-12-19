@@ -22,10 +22,11 @@ const data = [
               {label:'Item4', value:'item4'},
               {label:'Item5', value:'item5'}
               ];
-
+const selectedItem = data[1];
 const App = () => {
         return <div>
-            <FlexDropdown data={data} editable={true} placeholder='Choose' onItemSelect={onItemSelect}/>
+            <FlexDropdown data={data} editable={true} placeholder='Choose'
+            onItemSelect={onItemSelect} selectedItem={selectedItem} />
         </div>
 }
 export default App;

@@ -15,7 +15,8 @@ class FlexDropDown extends Component {
       }
       return item;
     });
-    this.state = { showDropdown: false, data, filteredData: data, selectedItem: '', selectedText: '' };
+    const selectedValue = props.selectedItem ? (props.selectedItem.label || props.selectedItem) : '';
+    this.state = { showDropdown: false, data, filteredData: data, selectedValue };
   }
 
   onFocusOut = e => {
@@ -38,17 +39,17 @@ class FlexDropDown extends Component {
   }
 
   onInputChange = e => {
-    const selectedText = e.target.value;
-    if (selectedText === '') {
-      this.setState({ showDropdown: false, selectedItem: '', filteredData: this.state.data, selectedText });
+    const selectedValue = e.target.value;
+    if (selectedValue === '') {
+      this.setState({ showDropdown: false, filteredData: this.state.data, selectedValue });
     } else {
-      const filteredData = this.state.data.filter(item => item.label.toLowerCase().indexOf(selectedText.toLowerCase()) !== -1);
-      this.setState({ showDropdown: true, filteredData, selectedText });
+      const filteredData = this.state.data.filter(item => item.label.toLowerCase().indexOf(selectedValue.toLowerCase()) !== -1);
+      this.setState({ showDropdown: true, filteredData, selectedValue });
     }
   };
 
   onItemSelect(item) {
-    this.setState({ showDropdown: false, selectedText: item.label });
+    this.setState({ showDropdown: false, selectedValue: item.label });
     this.props.onItemSelect(item.value);
   }
 
@@ -59,43 +60,43 @@ class FlexDropDown extends Component {
   };
 
   keyDownHandler = e => {
-    const { filteredData, selectedText } = this.state;
+    const { filteredData, selectedValue } = this.state;
     if (filteredData.length === 0) {
       return;
     }
     if (e.keyCode === 13) {
-      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedText.toLowerCase());
-      const selectedItem = filteredData.find(item => item.label.toLowerCase() === selectedText.toLowerCase());
+      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedValue.toLowerCase());
+      const selectedItem = filteredData.find(item => item.label.toLowerCase() === selectedValue.toLowerCase());
       if (selectedIndex === -1) {
         return;
       } else {
         this.props.onItemSelect(selectedItem.value);
-        this.setState({ showDropdown: false, selectedText: selectedItem.label });
+        this.setState({ showDropdown: false, selectedValue: selectedItem.label });
         return;
       }
     } else if (e.keyCode === 40) {
-      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedText.toLowerCase());
+      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedValue.toLowerCase());
       this.setState({ showDropdown: true });
       if (selectedIndex === -1) {
-        this.setState({ selectedText: filteredData[0].label });
+        this.setState({ selectedValue: filteredData[0].label });
         return;
       }
       if (selectedIndex !== filteredData.length - 1) {
-        this.setState({ selectedText: filteredData[selectedIndex + 1].label, selectedItem: filteredData[selectedIndex + 1] });
+        this.setState({ selectedValue: filteredData[selectedIndex + 1].label, selectedItem: filteredData[selectedIndex + 1] });
       } else {
-        this.setState({ selectedText: filteredData[selectedIndex].label, selectedItem: filteredData[selectedIndex] });
+        this.setState({ selectedValue: filteredData[selectedIndex].label, selectedItem: filteredData[selectedIndex] });
       }
     } else if (e.keyCode === 38) {
-      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedText.toLowerCase());
+      const selectedIndex = filteredData.findIndex(item => item.label.toLowerCase() === selectedValue.toLowerCase());
       this.setState({ showDropdown: true });
       if (selectedIndex === -1) {
-        this.setState({ selectedText: filteredData[0].label, selectedItem: filteredData[0] });
+        this.setState({ selectedValue: filteredData[0].label, selectedItem: filteredData[0] });
         return;
       }
       if (selectedIndex !== 0) {
-        this.setState({ selectedText: filteredData[selectedIndex - 1].label, selectedItem: filteredData[selectedIndex - 1] });
+        this.setState({ selectedValue: filteredData[selectedIndex - 1].label, selectedItem: filteredData[selectedIndex - 1] });
       } else {
-        this.setState({ selectedText: filteredData[selectedIndex].label, selectedItem: filteredData[selectedIndex] });
+        this.setState({ selectedValue: filteredData[selectedIndex].label, selectedItem: filteredData[selectedIndex] });
       }
     }
     if (this.selectedLi) {
@@ -131,11 +132,11 @@ class FlexDropDown extends Component {
   }
 
   renderList() {
-    const { filteredData, selectedText } = this.state;
+    const { filteredData, selectedValue } = this.state;
     return (
       <ul className="dropdownList">
         {filteredData.map((item, i) => {
-          const selected = item.label.toLowerCase() === selectedText.toLowerCase() ? 'selected' : '';
+          const selected = item.label.toLowerCase() === selectedValue.toLowerCase() ? 'selected' : '';
           return (
             <li
               key={item.value}
@@ -157,7 +158,7 @@ class FlexDropDown extends Component {
 
   render() {
     const { placeholder, editable } = this.props;
-    const { selectedText, showDropdown } = this.state;
+    const { selectedValue, showDropdown } = this.state;
     return (
       <div className="dropdown" onClick={this.onFocus} tabIndex="0">
         <div className="inputArrow">
@@ -168,7 +169,7 @@ class FlexDropDown extends Component {
             placeholder={placeholder}
             disabled={!editable}
             onChange={this.onInputChange}
-            value={selectedText}
+            value={selectedValue}
           />
           <span className={showDropdown ? 'dropdown-arrow-open' : 'dropdown-arrow-close'} onClick={() => this.setState({ showDropdown: !showDropdown })} />
         </div>
@@ -182,10 +183,14 @@ FlexDropDown.defaultProps = {
   data: [],
   editable: false,
   placeholder: 'Select',
+  selectedItem: null,
   onItemSelect: () => {}
 };
 FlexDropDown.proptypes = {
   onItemSelect: PropTypes.func,
-  data: PropTypes.array
+  data: PropTypes.array,
+  editable: PropTypes.bool,
+  placholder: PropTypes.string,
+  selectedItem: PropTypes.any
 };
 export default FlexDropDown;
